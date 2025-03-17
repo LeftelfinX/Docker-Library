@@ -1,25 +1,24 @@
 # version: '3.8'
 
 services:
-
-  # Runtime 
+  # Ollama Runtime : Running on port 11434
   ollama:
     image: ollama/ollama:rocm
     container_name: ollama-container
     restart: always
-    network_mode: host  # Allows direct communication with open-webui
+    network_mode: host 
     devices:
       - /dev/kfd
       - /dev/dri
     environment:
       - HSA_OVERRIDE_GFX_VERSION=10.3.0
-      - HCC_AMDGPU_TARGET=gfx1030 
+      - HCC_AMDGPU_TARGET=gfx1030
     ports:
       - "11434:11434"
     volumes:
       - ollama:/root/.ollama
 
-  # WEB Interface : Can be accessed from any machin
+  # WEB Interface : Can be accessed from any machine on the port 6666
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
@@ -29,6 +28,8 @@ services:
       - open-webui:/app/backend/data
     environment:
       - OLLAMA_BASE_URL=http://127.0.0.1:11434
+    ports:
+      - "6666:8080"
 
 volumes:
   ollama:
