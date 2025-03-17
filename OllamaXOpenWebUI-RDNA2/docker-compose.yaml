@@ -1,0 +1,39 @@
+# version: '3.8'
+
+services:
+
+  # Runtime 
+  ollama:
+    image: ollama/ollama:rocm
+    container_name: ollama-container
+    restart: always
+    network_mode: host  # Allows direct communication with open-webui
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
+      - HCC_AMDGPU_TARGET=gfx1030 
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+  # WEB Interface : Can be accessed from any machin
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    network_mode: host
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+
+volumes:
+  ollama:
+    driver: local
+  open-webui:
+    driver: local
+
+# !!! This file is hardcoded for amd rdna2 series gpus. !!!
