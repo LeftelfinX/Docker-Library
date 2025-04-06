@@ -8,6 +8,8 @@ services:
   ollama:
     image: ollama/ollama:rocm
     container_name: ollama-container
+    # labels:
+    #   - "com.centurylinklabs.watchtower.enable=true"
     restart: always
     devices:
       - /dev/kfd
@@ -26,6 +28,8 @@ services:
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
+    # labels:
+    #   - "com.centurylinklabs.watchtower.enable=true"
     restart: always
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434  # Use service name instead of 127.0.0.1
