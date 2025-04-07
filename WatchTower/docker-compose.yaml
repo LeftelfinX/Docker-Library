@@ -16,6 +16,8 @@ services:
     environment:
         - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_TOKEN}
 
+    network_mode: bridge
+
     ports:
     - "0.0.0.0:18080:8080" # API Exposed on port 18080
 
