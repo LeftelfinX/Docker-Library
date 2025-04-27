@@ -1,12 +1,16 @@
 #!/bin/bash
 
 PORT=6500
+CONTAINER=open-webui
 
 echo "Starting Docker Compose on port $PORT..."
 docker-compose up -d
 
-echo "Checking if the container is running..."
-docker ps
+echo "Waiting for container $CONTAINER to be healthy..."
+while [[ "$(docker inspect --format='{{.State.Health.Status}}' $CONTAINER)" != "healthy" ]]; do
+    echo "Container not healthy yet. Waiting 2 seconds..."
+    sleep 2
+done
 
-echo "Testing if port $PORT is accessible (optional)..."
-curl -v http://localhost:$PORT || echo "Port not responding (may still be starting)"
+echo "Container is healthy! Checking if port $PORT is accessible..."
+curl -v http://localhost:$PORT || echo "Port not responding (unexpected)"

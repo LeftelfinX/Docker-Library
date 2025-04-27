@@ -1,6 +1,6 @@
 networks:
   AI_network:
-    name: AI_network  
+    name: AI_network
     driver: bridge
 
 services:
@@ -15,14 +15,14 @@ services:
       - /dev/kfd
       - /dev/dri
     environment:
-      - HSA_OVERRIDE_GFX_VERSION=10.3.0  # Change if not RDNA2
-      - HCC_AMDGPU_TARGET=gfx1030        # Change if not RDNA2
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0 # Change if not RDNA2
+      - HCC_AMDGPU_TARGET=gfx1030 # Change if not RDNA2
     volumes:
       - ${HOME}/.Docker-Volumes/ollama_data:/root/.ollama
     networks:
       - AI_network
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"
 
   # WEB Interface : Can be accessed from any machine on port 6500
   open-webui:
@@ -32,7 +32,7 @@ services:
     #   - "com.centurylinklabs.watchtower.enable=true"
     restart: always
     environment:
-      - OLLAMA_BASE_URL=http://ollama:11434  # Use service name instead of 127.0.0.1
+      - OLLAMA_BASE_URL=http://ollama:11434 # Use service name instead of 127.0.0.1
     volumes:
       - ${HOME}/.Docker-Volumes/open-webui:/app/backend/data
     networks:
