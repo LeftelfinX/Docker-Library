@@ -1,0 +1,29 @@
+# version: "3.8"
+services:
+  kavita:
+    image: lscr.io/linuxserver/kavita:latest
+    container_name: kavita
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/kavita/config:/config
+      - /mnt/Watch-Library/Book-Library:/data
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    mem_limit: 2g
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    networks:
+      - kavita_network
+
+networks:
+  kavita_network:
+    driver: bridge
