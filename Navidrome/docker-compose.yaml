@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: "1000:1000"
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      ND_SCANSCHEDULE: 1h  # Better than default 1m scans
+      ND_LOGLEVEL: info    # Less verbose than debug
+    volumes:
+      - "~/kavita/config:/data"
+      - "/mnt/Watch-Library/Music:/music:ro"  # Read-only prevents accidental writes
+    networks:
+      - navidrome_network  # Custom isolated network
+
+networks:
+  navidrome_network:
+    driver: bridge
+    attachable: true  # Allows other containers to join later
