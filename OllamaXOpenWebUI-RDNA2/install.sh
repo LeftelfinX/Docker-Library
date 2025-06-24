@@ -13,4 +13,8 @@ while [[ "$(docker inspect --format='{{.State.Health.Status}}' $CONTAINER)" != "
 done
 
 echo "Container is healthy! Checking if port $PORT is accessible..."
-curl -v http://localhost:$PORT || echo "Port not responding (unexpected)"
+if curl --silent --output /dev/null --fail http://localhost:$PORT; then
+    echo "Port $PORT is accessible ✅"
+else
+    echo "Port $PORT is not responding ❌"
+fi

@@ -1,24 +1,8 @@
 services:
   watchtower:
-    container_name: Watchtower
     image: containrrr/watchtower
-
+    container_name: watchtower-once
+    restart: "no"
     volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-
-    command: 
-        # --debug 
-        --cleanup
-        --http-api-update
-        --interval 0
-        # --label-enable
-
-    environment:
-        - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_TOKEN}
-
-    network_mode: bridge
-
-    ports:
-    - "0.0.0.0:18080:8080" # API Exposed on port 18080
-
-    restart: unless-stopped
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --run-once --label-enable
