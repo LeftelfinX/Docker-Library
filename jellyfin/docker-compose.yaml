@@ -1,0 +1,14 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}           # User ID, set dynamically
+      - PGID=${PGID}           # Group ID, set dynamically
+      - TZ=Asia/Kolkata        # Your timezone
+    network_mode: host 
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ${MEDIA_DIR}:/media
+    restart: unless-stopped
