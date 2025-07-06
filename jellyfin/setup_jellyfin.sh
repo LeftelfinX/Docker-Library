@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-# Get current script folder (should contain docker-compose.yml)
+# Get current script folder (should contain docker-compose.yaml)
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Target folder in user home
+TARGET_DIR="$HOME/jellyfin"
+
+echo "📁 Creating Jellyfin folder at: $TARGET_DIR"
+mkdir -p "$TARGET_DIR"
 
 # Get UID and GID
 PUID=$(id -u)
@@ -19,24 +25,30 @@ if [ ! -d "$MEDIA_DIR" ]; then
   exit 1
 fi
 
-# Create .env
-cat > "$PROJECT_DIR/.env" <<EOF
+# Create .env in target folder
+cat > "$TARGET_DIR/.env" <<EOF
 PUID=$PUID
 PGID=$PGID
 MEDIA_DIR=$MEDIA_DIR
 EOF
 
-echo "✅ .env file created:"
+echo "✅ .env file created in $TARGET_DIR:"
 echo "  PUID=$PUID"
 echo "  PGID=$PGID"
 echo "  MEDIA_DIR=$MEDIA_DIR"
 
-# Make sure config and cache directories exist
-mkdir -p "$PROJECT_DIR/config" "$PROJECT_DIR/cache"
+# Copy docker-compose.yaml
+cp "$PROJECT_DIR/docker-compose.yaml" "$TARGET_DIR/"
+
+# Make sure config and cache exist in target
+mkdir -p "$TARGET_DIR/config" "$TARGET_DIR/cache"
 
 # Fix permissions
 echo "🔑 Fixing permissions for config, cache, and media..."
-sudo chown -R "$PUID:$PGID" "$PROJECT_DIR/config" "$PROJECT_DIR/cache" "$MEDIA_DIR"
+sudo chown -R "$PUID:$PGID" "$TARGET_DIR/config" "$TARGET_DIR/cache" "$MEDIA_DIR"
+
+# Change to target directory
+cd "$TARGET_DIR" || exit 1
 
 # Start Jellyfin
 echo "🚀 Starting Jellyfin with Docker Compose..."
