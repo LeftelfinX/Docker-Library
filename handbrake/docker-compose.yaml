@@ -1,0 +1,13 @@
+services:
+  handbrake:
+    image: jlesage/handbrake
+    container_name: handbrake
+    restart: unless-stopped
+    ports:
+      - "5800:5800"  # Web GUI (noVNC)
+    environment:
+      - TZ=Asia/Kolkata
+    volumes:
+      - /mnt/handbrake_data/Input:/watch:ro
+      - /mnt/handbrake_data/Output:/output
+      - /mnt/handbrake_share/config:/config
