@@ -1,15 +1,25 @@
+version: '3.8'
+
 services:
-  handbrake:
-    image: jlesage/handbrake
-    container_name: handbrake
-    restart: unless-stopped
+  handbrake-server:
+    image: ghcr.io/thenickoftime/handbrake-web-server:latest
+    container_name: handbrake-web-server
+    user: "${PUID}:${PGID}"
     ports:
-      - "5800:5800"  # Web GUI (noVNC)
-    environment:
-      - TZ=Asia/Kolkata
-      - AUTOSTART=0
-      - DARK_MODE=1
+      - "9999:9999"
     volumes:
-      - /mnt/handbrake_data/Input:/watch:ro
-      - /mnt/handbrake_data/Output:/output
-      - /mnt/handbrake_share/config:/config
+      - ${CONFIG_DIR}:/data
+      - ${MEDIA_DIR}:/video
+
+  handbrake-worker:
+    image: ghcr.io/thenickoftime/handbrake-web-worker:latest
+    container_name: handbrake-web-worker
+    user: "${PUID}:${PGID}"
+    environment:
+      - WORKER_ID=handbrake-worker
+      - SERVER_URL=http://handbrake-server
+      - SERVER_PORT=9999
+    volumes:
+      - ${MEDIA_DIR}:/video
+    depends_on:
+      - handbrake-server

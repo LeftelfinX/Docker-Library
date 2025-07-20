@@ -1,56 +1,48 @@
 #!/usr/bin/env bash
 
-# Get current script folder
+# Get current script directory
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Get UID and GID
+# Detect current user
 PUID=$(id -u)
 PGID=$(id -g)
+USERNAME=$(whoami)
+HOME_DIR=$(eval echo "~$USERNAME")
 
-echo "Detected UID: $PUID"
-echo "Detected GID: $PGID"
+echo "👤 Detected user: $USERNAME (UID: $PUID, GID: $PGID)"
 
-# Prompt for full path to Input and Output folders
-read -rp "Enter the FULL PATH to your HandBrake Input folder: " INPUT_DIR
-read -rp "Enter the FULL PATH to your HandBrake Output folder: " OUTPUT_DIR
+# Prompt for a single media directory
+read -rp "📂 Enter the FULL PATH to your HandBrake media folder (input & output): " MEDIA_DIR
 
-# Automatically set Config folder to ~/handbrake/config
-CONFIG_DIR="$HOME/handbrake/config"
+if [ ! -d "$MEDIA_DIR" ]; then
+  echo "❌ Error: Directory '$MEDIA_DIR' does not exist. Exiting."
+  exit 1
+fi
+
+# Define config folder
+CONFIG_DIR="$HOME_DIR/handbrake/config"
 mkdir -p "$CONFIG_DIR"
-
-# Validate input/output folders
-for DIR in "$INPUT_DIR" "$OUTPUT_DIR"; do
-  if [ ! -d "$DIR" ]; then
-    echo "❌ Error: Directory '$DIR' does not exist. Exiting."
-    exit 1
-  fi
-done
 
 # Create .env file
 cat > "$PROJECT_DIR/.env" <<EOF
 PUID=$PUID
 PGID=$PGID
-INPUT_DIR=$INPUT_DIR
-OUTPUT_DIR=$OUTPUT_DIR
+MEDIA_DIR=$MEDIA_DIR
 CONFIG_DIR=$CONFIG_DIR
 EOF
 
 echo "✅ .env file created:"
-echo "  PUID=$PUID"
-echo "  PGID=$PGID"
-echo "  INPUT_DIR=$INPUT_DIR"
-echo "  OUTPUT_DIR=$OUTPUT_DIR"
+echo "  MEDIA_DIR=$MEDIA_DIR"
 echo "  CONFIG_DIR=$CONFIG_DIR"
 
-# Fix permissions
-echo "🔑 Fixing permissions..."
-sudo chown -R "$PUID:$PGID" "$INPUT_DIR" "$OUTPUT_DIR" "$CONFIG_DIR"
+# Set correct ownership
+echo "🔐 Fixing permissions..."
+sudo chown -R "$PUID:$PGID" "$CONFIG_DIR" "$MEDIA_DIR"
 
-# Start HandBrake
-echo "🚀 Starting HandBrake with Docker Compose..."
+# Start the docker compose stack
+echo "🚀 Starting HandBrake Web stack..."
 docker compose up -d
 
-# Detect local IP
-SERVER_IP=$(hostname -I | awk '{print $1}')
-echo "✅ HandBrake is now running!"
-echo "🌐 Access the Web UI at: http://${SERVER_IP}:5800"
+# Get local IP
+IP=$(hostname -I | awk '{print $1}')
+echo "🌐 Access the Web UI at: http://${IP}:9999"
