@@ -7,6 +7,8 @@ services:
       - "5800:5800"  # Web GUI (noVNC)
     environment:
       - TZ=Asia/Kolkata
+      - AUTOSTART=0
+      - DARK_MODE=1
     volumes:
       - /mnt/handbrake_data/Input:/watch:ro
       - /mnt/handbrake_data/Output:/output
