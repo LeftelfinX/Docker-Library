@@ -10,13 +10,16 @@ PGID=$(id -g)
 echo "Detected UID: $PUID"
 echo "Detected GID: $PGID"
 
-# Prompt for full path to Input, Output, and Config folders
+# Prompt for full path to Input and Output folders
 read -rp "Enter the FULL PATH to your HandBrake Input folder: " INPUT_DIR
 read -rp "Enter the FULL PATH to your HandBrake Output folder: " OUTPUT_DIR
-read -rp "Enter the FULL PATH to your HandBrake Config folder: " CONFIG_DIR
 
-# Validate folders
-for DIR in "$INPUT_DIR" "$OUTPUT_DIR" "$CONFIG_DIR"; do
+# Automatically set Config folder to ~/handbrake/config
+CONFIG_DIR="$HOME/handbrake/config"
+mkdir -p "$CONFIG_DIR"
+
+# Validate input/output folders
+for DIR in "$INPUT_DIR" "$OUTPUT_DIR"; do
   if [ ! -d "$DIR" ]; then
     echo "❌ Error: Directory '$DIR' does not exist. Exiting."
     exit 1
