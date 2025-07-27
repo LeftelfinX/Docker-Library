@@ -1,13 +1,16 @@
 services:
   handbrake:
-    build: .
+    build:
+      context: .
+      args:
+        PUID: ${PUID}
+        PGID: ${PGID}
     container_name: HandbrakeGUI
     ports:
-      - "9999:14500"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - "9999:10000"
     volumes:
-      - ${MEDIA_DIR}:/config/media
-      - ${CONFIG_DIR}:/config
+      - "${MEDIA_DIR}:/media"
+      - "${CONFIG_DIR}:/config"
+    environment:
+      - DISPLAY=:0
     restart: unless-stopped

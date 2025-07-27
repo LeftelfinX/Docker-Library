@@ -1,61 +1,38 @@
 #!/usr/bin/env bash
 
-set -e
+# Set project directory
+PROJECT_DIR="$HOME/HandbrakeGUI"
 
-echo "📦 Setting up HandBrake GUI environment..."
+# Create directory and copy files
+mkdir -p "$PROJECT_DIR"
+cp -r . "$PROJECT_DIR"
 
-# Paths
-HOME_DIR="$HOME"
-DEST_DIR="$HOME_DIR/HandbrakeGUI"
-MEDIA_DIR="$DEST_DIR/media"
-CONFIG_DIR="$DEST_DIR/config"
+# Set working directory
+cd "$PROJECT_DIR" || exit 1
 
-# Create target directory
-mkdir -p "$DEST_DIR"
-cp Dockerfile docker-compose.yaml start.sh "$DEST_DIR"
-chmod +x "$DEST_DIR/start.sh"
-
-# Create media/output and config folders
-mkdir -p "$MEDIA_DIR/output"
-mkdir -p "$CONFIG_DIR"
-
-# Detect current user
+# Detect user info
 PUID=$(id -u)
 PGID=$(id -g)
 
-# Generate .env file
-cat > "$DEST_DIR/.env" <<EOF
+# Create media and output dirs
+mkdir -p "$PROJECT_DIR/media/output"
+mkdir -p "$PROJECT_DIR/config"
+
+# Write .env file
+cat > .env <<EOF
 PUID=$PUID
 PGID=$PGID
-MEDIA_DIR=$MEDIA_DIR
-CONFIG_DIR=$CONFIG_DIR
+MEDIA_DIR=$PROJECT_DIR/media
+CONFIG_DIR=$PROJECT_DIR/config
 EOF
 
-echo "✅ .env file created:"
-echo "   MEDIA_DIR = $MEDIA_DIR"
-echo "   OUTPUT    = $MEDIA_DIR/output"
-echo "   CONFIG    = $CONFIG_DIR"
-echo "   UID:GID   = $PUID:$PGID"
+# Set permissions
+sudo chown -R "$PUID:$PGID" "$PROJECT_DIR"
 
-# Fix permissions
-echo "🔐 Fixing permissions..."
-sudo chown -R "$PUID:$PGID" "$DEST_DIR"
-
-# Move to project folder
-cd "$DEST_DIR"
-
-# Build and start the container
-echo "🔧 Building Docker container..."
+# Build and start
 docker compose build
-
-echo "🚀 Starting Docker container..."
 docker compose up -d
 
-# Get IP
+# Print access info
 IP=$(hostname -I | awk '{print $1}')
-
-echo ""
-echo "✅ Setup complete!"
-echo "📂 Mount your SMB share manually to:"
-echo "   $MEDIA_DIR"
-echo "🌐 Access HandBrake GUI at: http://$IP:9999"
+echo "🌐 HandBrake GUI accessible at: http://$IP:9999"
