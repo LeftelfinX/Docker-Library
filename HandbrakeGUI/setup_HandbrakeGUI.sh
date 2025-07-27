@@ -18,7 +18,7 @@ mkdir -p "$OUTPUT_DIR"
 # Copy all docker files to HandbrakeGUI folder
 echo "📦 Copying files to $BASE_DIR..."
 cp Dockerfile "$BASE_DIR/"
-cp docker-compose.yml "$BASE_DIR/"
+cp docker-compose.yaml "$BASE_DIR/"
 cp entrypoint.sh "$BASE_DIR/"
 cp xpra.conf "$BASE_DIR/"
 
