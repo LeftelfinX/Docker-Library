@@ -22,11 +22,13 @@ RUN apt-get update && apt-get install -y \
 
 # Add non-root user
 RUN useradd -m appuser
-USER appuser
-WORKDIR /home/appuser
 
-# Copy entrypoint
+# Copy entrypoint *before* switching user
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Now switch to appuser
+USER appuser
+WORKDIR /home/appuser
 
 CMD ["/entrypoint.sh"]
