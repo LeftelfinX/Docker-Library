@@ -1,16 +1,13 @@
 services:
   handbrake:
-    build:
-      context: .
-      args:
-        PUID: ${PUID}
-        PGID: ${PGID}
+    build: .
     container_name: HandbrakeGUI
     ports:
-      - "9999:10000"
-    volumes:
-      - "${MEDIA_DIR}:/media"
-      - "${CONFIG_DIR}:/config"
+      - "10000:10000"  # Xpra WebSocket
     environment:
       - DISPLAY=:0
+      - XDG_RUNTIME_DIR=/run/user/1000
+    volumes:
+      - ${MEDIA_DIR}:/home/appuser/media
+    user: "${PUID}:${PGID}"
     restart: unless-stopped

@@ -1,34 +1,36 @@
-FROM ubuntu:22.04
+FROM debian:bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:0
 
-# Install system packages
-RUN apt update && apt install -y \
-    handbrake \
+# Install dependencies
+RUN apt-get update && apt-get install -y \
     xpra \
     xauth \
-    xvfb \
     dbus-x11 \
+    handbrake-gtk \
     python3-pip \
-    ca-certificates \
-    curl \
-    sudo \
-    --no-install-recommends && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+    python3-dbus \
+    python3-pyinotify \
+    python3-xdg \
+    python3-pil \
+    python3-paramiko \
+    x11-xserver-utils \
+    xfonts-base \
+    fonts-dejavu \
+    libgl1 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create user to match host UID/GID
-ARG PUID=1000
-ARG PGID=1000
-RUN groupadd -g ${PGID} appgroup && \
-    useradd -u ${PUID} -g appgroup -m appuser && \
-    usermod -aG sudo appuser
-
-# Set user
+# Create app user and dirs
+RUN useradd -ms /bin/bash appuser
 USER appuser
+WORKDIR /home/appuser
 
-# Set working directory
-WORKDIR /config
+# Copy configs
+COPY --chown=appuser:appuser entrypoint.sh /entrypoint.sh
+COPY --chown=appuser:appuser xpra.conf /home/appuser/.xpra/xpra.conf
+RUN chmod +x /entrypoint.sh
 
-# Entrypoint
-CMD xpra start --bind-tcp=0.0.0.0:10000 --html=on --start=handbrake --daemon=no
+EXPOSE 10000
+
+ENTRYPOINT ["/entrypoint.sh"]
