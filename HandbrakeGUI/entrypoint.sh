@@ -12,7 +12,7 @@ xpra start :0 \
   --bind-tcp=0.0.0.0:10000 \
   --html=on \
   --daemon=no \
-  --start-child=handbrake \
+  --start-child=ghb \
   --exit-with-children \
   --no-mdns \
   --no-notifications \
