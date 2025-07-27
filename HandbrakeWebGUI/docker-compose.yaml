@@ -1,0 +1,12 @@
+services:
+  handbrake:
+    build: .
+    container_name: HandbrakeWebGUI
+    ports:
+      - "8080:8080"
+    environment:
+      - MEDIA_DIR=/home/handbrake/media
+    volumes:
+      - "${MEDIA_PATH}:/home/handbrake/media"
+      - "./config/ghb:/home/handbrake/.config/ghb"
+    restart: unless-stopped
