@@ -1,22 +1,25 @@
 #!/bin/bash
+set -e
 
-# Start 1080p virtual display
-Xvfb :1 -screen 0 1920x1080x24 &
+# Start virtual display
+Xvfb :99 -screen 0 1920x1080x24 &
+export DISPLAY=:99
 
-export DISPLAY=:1
+# Wait for Xvfb to be ready
+sleep 2
 
-# Start window manager
-fluxbox &
+# Start VNC server (on all interfaces)
+x11vnc -display :99 -nopw -forever -shared -rfbport 5900 -listen 0.0.0.0 &
 
-# Start VNC server
-x11vnc -display :1 -nopw -forever -shared -rfbport 5901 &
-
-# Start noVNC bridge
-websockify --web=/usr/share/novnc/ 8080 localhost:5901 &
+# Start noVNC (on all interfaces)
+websockify --web=/usr/share/novnc/ 0.0.0.0:8080 0.0.0.0:5900 &
 
 # Show media mount and config
 echo "📁 Media directory: ${MEDIA_DIR:-/home/handbrake/media}"
 echo "⚙️  Config directory: /home/handbrake/.config/ghb"
 
-# Launch HandBrake GUI
-ghb
+# Force dark GTK theme
+export GTK_THEME=Adwaita:dark
+
+# Launch HandBrake GUI (binary is ghb in Arch)
+ghb --fullscreen

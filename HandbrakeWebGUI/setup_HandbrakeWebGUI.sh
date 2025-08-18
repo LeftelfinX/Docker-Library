@@ -35,5 +35,11 @@ echo "MEDIA_PATH=$MEDIA_PATH" > .env
 echo "🚀 Launching Docker Compose..."
 docker-compose up -d --build
 
+# Detect local IP
+SERVER_IP=$(hostname -I | awk '{print $1}')
+if [ -z "$SERVER_IP" ]; then
+  SERVER_IP=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
+fi
+
 echo "✅ Setup complete!"
-echo "🌐 Open http://<your-server-ip>:8080/vnc.html?resize=scale to use HandBrake GUI."
+echo "🌐 Open http://$SERVER_IP:8080/vnc.html?resize=scale to use HandBrake GUI."
